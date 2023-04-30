@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
+using static PudelkoLibrary.Pudelko;
 
 namespace PudelkoUnitTests
 {
@@ -446,17 +447,101 @@ namespace PudelkoUnitTests
         #endregion
 
 
-        #region Pole, Objętość ===================================
-        // ToDo
+        #region Area, Volume ===================================
+        [DataTestMethod]
+        [DataRow(2,3,4,UnitOfMeasure.meter, 24)]
+        [DataRow(200, 300, 400, UnitOfMeasure.centimeter, 24)]
+        [DataRow(2000, 3000, 4000, UnitOfMeasure.milimeter, 24)]
+        public void Volume_Get_ReturnsCorrectValue(double a, double b, double c, UnitOfMeasure unit, double expected)
+        {
+            var box = new Pudelko(a, b, c, unit);
+            Assert.AreEqual(expected, box.Volume);
+        }
+
+        [DataTestMethod]
+        [DataRow(2, 3, 4, UnitOfMeasure.meter, 52)]
+        [DataRow(200, 300, 400, UnitOfMeasure.centimeter, 52)]
+        [DataRow(2000, 3000, 4000, UnitOfMeasure.milimeter, 52)]
+        public void Area_Get_ReturnsCorrectValue(double a, double b, double c, UnitOfMeasure unit, double expected)
+        {
+            var box = new Pudelko(a, b, c, unit);
+            Assert.AreEqual(expected, box.Area);
+        }
 
         #endregion
 
         #region Equals ===========================================
-        // ToDo
+        [TestMethod]
+        public void Equality_ReturnsTrueForEqualBoxes()
+        {
+            var box1 = new Pudelko(2, 3, 4);
+            var box2 = new Pudelko(2, 3, 4);
+            var result = box1.Equals(box2);
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void OperatorEquality_ReturnsTrueForEqualBoxes()
+        {
+            var box1 = new Pudelko(2, 3, 4);
+            var box2 = new Pudelko(2, 3, 4);
+            var result = box1 == box2;
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void OperatorEquality_ReturnsFalseForUnequalBoxes()
+        {
+            var box1 = new Pudelko(2, 3, 4);
+            var box2 = new Pudelko(3, 4, 5);
+            var result = box1 != box2;
+            Assert.IsTrue(result);
+        }
+
+        public void Equality_ReturnsFalseForUnequalBoxes()
+        {
+            var box1 = new Pudelko(2, 3, 4);
+            var box2 = new Pudelko(3, 4, 5);
+            var result = box1.Equals(box2);
+            Assert.IsFalse(result);
+        }
         #endregion
 
         #region Operators overloading ===========================
-        // ToDo
+        [TestMethod]
+        public void OperatorPlus_ReturnsSmallestBoxToContainBothBoxes()
+        {
+            var box1 = new Pudelko(1.0, 2.0, 3.0);
+            var box2 = new Pudelko(2.0, 3.0, 4.0);
+            var expected = new Pudelko(2.0, 3.0, 4.0);
+            var actual = box1 + box2;
+            Assert.AreEqual(expected.A, actual.A);
+            Assert.AreEqual(expected.B, actual.B);
+            Assert.AreEqual(expected.C, actual.C);
+        }
+
+
+        [TestMethod]
+        public void OperatorPlus_ReturnsSameBoxIfBothBoxesAreEqual()
+        {
+            var box1 = new Pudelko(2, 3, 4);
+            var box2 = new Pudelko(2, 3, 4);
+            var result = box1 + box2;
+            Assert.AreEqual(2, result.A);
+            Assert.AreEqual(3, result.B);
+            Assert.AreEqual(4, result.C);
+        }
+
+        [TestMethod]
+        public void OperatorPlus_ReturnsCorrectBoxWhenOneBoxIsBigger()
+        {
+            var box1 = new Pudelko(2, 3, 4);
+            var box2 = new Pudelko(3, 5, 6);
+            var result = box1 + box2;
+            Assert.AreEqual(3, result.A);
+            Assert.AreEqual(5, result.B);
+            Assert.AreEqual(6, result.C);
+        }
         #endregion
 
         #region Conversions =====================================
@@ -509,7 +594,32 @@ namespace PudelkoUnitTests
         #endregion
 
         #region Parsing =========================================
+        [TestMethod]
+        public void Parse_InMeters_ValidInput_ReturnsPudelko()
+        {
+            string input = "2.500 m × 9.321 m × 0.100 m";
+            Pudelko expected = new Pudelko(2.500, 9.321, 0.100);
+            Pudelko result = Pudelko.Parse(input);
+            Assert.AreEqual(expected, result);
+        }
 
+        [TestMethod]
+        public void Parse_InCentimeters_ValidInput_ReturnsPudelko()
+        {
+            string input = "150 cm × 2 cm × 3 cm";
+            Pudelko expected = new Pudelko(1.5, 0.02, 0.03);
+            Pudelko result = Pudelko.Parse(input);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void Parse_InMilimeters_ValidInput_ReturnsPudelko()
+        {
+            string input = "150 mm × 20 mm × 3 mm";
+            Pudelko expected = new Pudelko(0.15, 0.02, 0.003);
+            Pudelko result = Pudelko.Parse(input);
+            Assert.AreEqual(expected, result);
+        }
         #endregion
 
     }
